@@ -1,0 +1,22 @@
+-- Global film cut templates (shop_id = NULL = default for all shops)
+INSERT INTO film_templates (shop_id, car_type, position, length_m, margin_m) VALUES
+  (NULL, 'sedan_s', 'front',      0.65, 0.15),
+  (NULL, 'sedan_s', 'rear',       0.60, 0.15),
+  (NULL, 'sedan_s', 'side_front', 0.42, 0.15),
+  (NULL, 'sedan_s', 'side_rear',  0.42, 0.15),
+  (NULL, 'sedan_m', 'front',      0.80, 0.15),
+  (NULL, 'sedan_m', 'rear',       0.72, 0.15),
+  (NULL, 'sedan_m', 'side_front', 0.48, 0.15),
+  (NULL, 'sedan_m', 'side_rear',  0.48, 0.15),
+  (NULL, 'suv',     'front',      0.90, 0.15),
+  (NULL, 'suv',     'rear',       0.85, 0.15),
+  (NULL, 'suv',     'side_front', 0.55, 0.15),
+  (NULL, 'suv',     'side_rear',  0.55, 0.15),
+  (NULL, 'pickup',  'front',      0.82, 0.15),
+  (NULL, 'pickup',  'rear',       0.65, 0.15),
+  (NULL, 'pickup',  'side_front', 0.48, 0.15),
+  (NULL, 'pickup',  'side_rear',  0.30, 0.15),
+  (NULL, 'van',     'front',      0.85, 0.15),
+  (NULL, 'van',     'rear',       0.80, 0.15),
+  (NULL, 'van',     'side_front', 0.55, 0.15),
+  (NULL, 'van',     'side_rear',  0.55, 0.15);
