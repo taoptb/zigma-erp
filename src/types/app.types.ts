@@ -57,6 +57,7 @@ export type ClaimWithDocuments = InsuranceClaim & {
 
 // ── Film calculator ───────────────────────────────────────────────────────────
 export type CarType = 'sedan_s' | 'sedan_m' | 'suv' | 'pickup' | 'van'
+// Intentionally different from GlassPosition — film cutting uses side_front/side_rear; mapping to DB positions is done in the film calculator layer
 export type FilmPosition = 'front' | 'rear' | 'side_front' | 'side_rear'
 
 export interface FilmCalculationInput {
