@@ -1,0 +1,166 @@
+'use client'
+
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
+
+export default function RegisterPage() {
+  const router = useRouter()
+  const [step, setStep] = useState<'account' | 'shop'>('account')
+  const [displayName, setDisplayName] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [shopName, setShopName] = useState('')
+  const [shopPhone, setShopPhone] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+
+  async function handleAccountSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    setStep('shop')
+  }
+
+  async function handleShopSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    setLoading(true)
+    setError(null)
+
+    const supabase = createClient()
+
+    // 1. Sign up
+    const { data: authData, error: signUpError } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { data: { display_name: displayName } },
+    })
+
+    if (signUpError || !authData.user) {
+      setError(signUpError?.message ?? 'สมัครไม่สำเร็จ')
+      setLoading(false)
+      return
+    }
+
+    // 2. Create shop
+    const slug = shopName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') +
+      '-' + Date.now().toString(36)
+
+    const { data: shop, error: shopError } = await supabase
+      .from('shops')
+      .insert({ name: shopName, slug, phone: shopPhone })
+      .select()
+      .single()
+
+    if (shopError || !shop) {
+      setError('สร้างอู่ไม่สำเร็จ กรุณาลองใหม่')
+      setLoading(false)
+      return
+    }
+
+    // 3. Link profile to shop with owner role
+    await supabase
+      .from('profiles')
+      .update({ shop_id: shop.id, role: 'owner', display_name: displayName })
+      .eq('id', authData.user.id)
+
+    router.push('/dashboard')
+    router.refresh()
+  }
+
+  if (step === 'account') {
+    return (
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+        <h2 className="text-xl font-semibold text-gray-900 mb-6">สร้างบัญชีผู้ดูแล</h2>
+        <form onSubmit={handleAccountSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">ชื่อ-นามสกุล</label>
+            <input
+              type="text"
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="สมชาย ใจดี"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">อีเมล</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">รหัสผ่าน</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              minLength={8}
+              required
+            />
+          </div>
+          <button
+            type="submit"
+            className="w-full py-2 px-4 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700"
+          >
+            ถัดไป →
+          </button>
+          <p className="text-center text-sm text-gray-500">
+            มีบัญชีแล้ว?{' '}
+            <a href="/login" className="text-blue-600 hover:underline font-medium">เข้าสู่ระบบ</a>
+          </p>
+        </form>
+      </div>
+    )
+  }
+
+  return (
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+      <h2 className="text-xl font-semibold text-gray-900 mb-6">ข้อมูลอู่</h2>
+      <form onSubmit={handleShopSubmit} className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">ชื่ออู่</label>
+          <input
+            type="text"
+            value={shopName}
+            onChange={(e) => setShopName(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="อู่กระจก สมชาย"
+            required
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">เบอร์โทรอู่</label>
+          <input
+            type="tel"
+            value={shopPhone}
+            onChange={(e) => setShopPhone(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="02-XXX-XXXX"
+          />
+        </div>
+        {error && <p className="text-sm text-red-600">{error}</p>}
+        <div className="flex gap-3">
+          <button
+            type="button"
+            onClick={() => setStep('account')}
+            className="flex-1 py-2 px-4 border border-gray-300 text-gray-700 text-sm font-semibold rounded-lg hover:bg-gray-50"
+          >
+            ← ย้อนกลับ
+          </button>
+          <button
+            type="submit"
+            disabled={loading}
+            className="flex-1 py-2 px-4 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 disabled:opacity-50"
+          >
+            {loading ? 'กำลังสร้าง...' : 'สร้างอู่'}
+          </button>
+        </div>
+      </form>
+    </div>
+  )
+}
