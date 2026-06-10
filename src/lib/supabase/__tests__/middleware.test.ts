@@ -6,7 +6,7 @@ vi.mock('@supabase/ssr', () => ({
 }))
 
 import { createServerClient } from '@supabase/ssr'
-import { middleware } from '@/middleware'
+import { proxy } from '@/proxy'
 
 function makeRequest(pathname: string) {
   return new NextRequest(new URL(`http://localhost:3000${pathname}`))
@@ -32,7 +32,7 @@ describe('middleware', () => {
   it('redirects unauthenticated users from protected routes to /login', async () => {
     mockSupabaseUser(null)
     const request = makeRequest('/dashboard')
-    const response = await middleware(request)
+    const response = await proxy(request)
     expect(response.status).toBe(307)
     expect(response.headers.get('location')).toContain('/login')
   })
@@ -40,21 +40,21 @@ describe('middleware', () => {
   it('allows unauthenticated users to access /login', async () => {
     mockSupabaseUser(null)
     const request = makeRequest('/login')
-    const response = await middleware(request)
+    const response = await proxy(request)
     expect(response.status).not.toBe(307)
   })
 
   it('allows unauthenticated users to access /invite routes', async () => {
     mockSupabaseUser(null)
     const request = makeRequest('/invite/abc123')
-    const response = await middleware(request)
+    const response = await proxy(request)
     expect(response.status).not.toBe(307)
   })
 
   it('redirects authenticated users from / to /dashboard', async () => {
     mockSupabaseUser({ id: 'user-1', email: 'test@example.com' })
     const request = makeRequest('/')
-    const response = await middleware(request)
+    const response = await proxy(request)
     expect(response.status).toBe(307)
     expect(response.headers.get('location')).toContain('/dashboard')
   })
@@ -62,7 +62,7 @@ describe('middleware', () => {
   it('allows authenticated users to access /dashboard', async () => {
     mockSupabaseUser({ id: 'user-1', email: 'test@example.com' })
     const request = makeRequest('/dashboard')
-    const response = await middleware(request)
+    const response = await proxy(request)
     expect(response.status).not.toBe(307)
   })
 })

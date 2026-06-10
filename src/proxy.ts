@@ -1,7 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
 
   const supabase = createServerClient(
@@ -34,10 +34,15 @@ export async function middleware(request: NextRequest) {
   if (!user && !isAuthRoute) {
     const loginUrl = new URL('/login', request.url)
     loginUrl.searchParams.set('redirect', request.nextUrl.pathname)
-    return NextResponse.redirect(loginUrl)
+    const redirectResponse = NextResponse.redirect(loginUrl)
+    // Forward session-clearing cookies to avoid infinite redirect loops
+    supabaseResponse.cookies.getAll().forEach((cookie) => {
+      redirectResponse.cookies.set(cookie.name, cookie.value)
+    })
+    return redirectResponse
   }
 
-  if (user && request.nextUrl.pathname === '/') {
+  if (user && (request.nextUrl.pathname === '/' || isAuthRoute)) {
     return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
@@ -46,6 +51,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|api|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }
