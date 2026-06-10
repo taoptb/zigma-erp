@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 
 export default function InvitePage() {
@@ -9,10 +10,9 @@ export default function InvitePage() {
   const params = useParams()
   const token = params.token as string
 
-  const [invitation, setInvitation] = useState<{
-    id: string; shop_id: string; email: string; role: string
-  } | null>(null)
+  const [invitation, setInvitation] = useState<{ email: string; role: string } | null>(null)
   const [notFound, setNotFound] = useState(false)
+  const [fetchError, setFetchError] = useState(false)
   const [password, setPassword] = useState('')
   const [displayName, setDisplayName] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -20,22 +20,20 @@ export default function InvitePage() {
 
   useEffect(() => {
     async function loadInvitation() {
-      const supabase = createClient()
-      const { data } = await supabase
-        .from('shop_invitations')
-        .select('id, shop_id, email, role')
-        .eq('token', token)
-        .is('accepted_at', null)
-        .gt('expires_at', new Date().toISOString())
-        .single()
-
-      if (!data) { setNotFound(true); return }
-      setInvitation(data)
+      try {
+        const res = await fetch(`/api/invite/${token}`)
+        if (res.status === 404) { setNotFound(true); return }
+        if (!res.ok) { setFetchError(true); return }
+        const data = await res.json()
+        setInvitation(data)
+      } catch {
+        setFetchError(true)
+      }
     }
     loadInvitation()
   }, [token])
 
-  async function handleAccept(e: React.FormEvent) {
+  async function handleAccept(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     if (!invitation) return
     setLoading(true)
@@ -55,31 +53,32 @@ export default function InvitePage() {
       return
     }
 
-    await supabase
-      .from('profiles')
-      .update({
-        shop_id: invitation.shop_id,
-        role: invitation.role as 'manager' | 'technician' | 'accountant',
-        display_name: displayName,
-      })
-      .eq('id', authData.user.id)
-
-    await supabase
-      .from('shop_invitations')
-      .update({ accepted_at: new Date().toISOString() })
-      .eq('id', invitation.id)
-
+    // The handle_new_user trigger automatically sets shop_id, role, and marks accepted_at
     router.push('/dashboard')
     router.refresh()
+  }
+
+  if (fetchError) {
+    return (
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center">
+        <p className="text-gray-700">ไม่สามารถโหลดข้อมูลได้ กรุณาลองใหม่อีกครั้ง</p>
+        <button
+          onClick={() => { setFetchError(false); window.location.reload() }}
+          className="mt-4 inline-block text-blue-600 hover:underline text-sm"
+        >
+          ลองใหม่
+        </button>
+      </div>
+    )
   }
 
   if (notFound) {
     return (
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center">
         <p className="text-gray-700">ลิงก์เชิญนี้ไม่ถูกต้องหรือหมดอายุแล้ว</p>
-        <a href="/login" className="mt-4 inline-block text-blue-600 hover:underline text-sm">
+        <Link href="/login" className="mt-4 inline-block text-blue-600 hover:underline text-sm">
           กลับไปหน้าเข้าสู่ระบบ
-        </a>
+        </Link>
       </div>
     )
   }
@@ -106,6 +105,7 @@ export default function InvitePage() {
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            autoComplete="name"
             required
           />
         </div>
@@ -121,6 +121,7 @@ export default function InvitePage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            autoComplete="new-password"
             minLength={8}
             required
           />

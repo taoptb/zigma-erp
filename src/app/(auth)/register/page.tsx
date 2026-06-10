@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 
 export default function RegisterPage() {
@@ -15,7 +16,7 @@ export default function RegisterPage() {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
-  async function handleAccountSubmit(e: React.FormEvent) {
+  function handleAccountSubmit(e: React.FormEvent) {
     e.preventDefault()
     setStep('shop')
   }
@@ -57,10 +58,16 @@ export default function RegisterPage() {
     }
 
     // 3. Link profile to shop with owner role
-    await supabase
+    const { error: profileError } = await supabase
       .from('profiles')
       .update({ shop_id: shop.id, role: 'owner', display_name: displayName })
       .eq('id', authData.user.id)
+
+    if (profileError) {
+      setError('สร้างบัญชีสำเร็จ แต่ตั้งค่าโปรไฟล์ไม่สำเร็จ กรุณาติดต่อฝ่ายสนับสนุน')
+      setLoading(false)
+      return
+    }
 
     router.push('/dashboard')
     router.refresh()
@@ -111,7 +118,7 @@ export default function RegisterPage() {
           </button>
           <p className="text-center text-sm text-gray-500">
             มีบัญชีแล้ว?{' '}
-            <a href="/login" className="text-blue-600 hover:underline font-medium">เข้าสู่ระบบ</a>
+            <Link href="/login" className="text-blue-600 hover:underline font-medium">เข้าสู่ระบบ</Link>
           </p>
         </form>
       </div>
