@@ -1,20 +1,18 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
-
 @import "tailwindcss";
 
 @layer base {
   body {
-    font-family: 'IBM Plex Sans Thai', sans-serif;
+    font-family: var(--font-sans), sans-serif;
     color: #111827;
   }
 
   code, kbd, pre, .mono {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: var(--font-mono), monospace;
   }
 }
 
 @utility plate {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: var(--font-mono), monospace;
   background-color: #111827;
   color: #ffffff;
   padding-inline: 0.5rem;

@@ -12,20 +12,22 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const { data: profile } = await supabase
+  const { data: profile, error: profileError } = await supabase
     .from('profiles')
     .select('*')
     .eq('id', user.id)
     .single()
 
+  if (profileError) console.error('[AppLayout] profile fetch error:', profileError.message)
   if (!profile?.shop_id) redirect('/register')
 
-  const { data: shop } = await supabase
+  const { data: shop, error: shopError } = await supabase
     .from('shops')
     .select('*')
     .eq('id', profile.shop_id)
     .single()
 
+  if (shopError) console.error('[AppLayout] shop fetch error:', shopError.message)
   if (!shop) redirect('/register')
 
   const shopContext: ShopContext = {
