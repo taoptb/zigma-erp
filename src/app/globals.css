@@ -1,8 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 @layer base {
   body {
@@ -15,8 +13,14 @@
   }
 }
 
-@layer utilities {
-  .plate {
-    @apply font-mono bg-gray-900 text-white px-2 py-0.5 rounded text-sm font-medium tracking-wider;
-  }
+@utility plate {
+  font-family: 'IBM Plex Mono', monospace;
+  background-color: #111827;
+  color: #ffffff;
+  padding-inline: 0.5rem;
+  padding-block: 0.125rem;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
 }
