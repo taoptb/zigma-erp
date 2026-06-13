@@ -3,25 +3,8 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { StockTable } from './stock-table'
+import { StockInDialog } from './stock-in-dialog'
 import type { StockItem } from '@/types/app.types'
-
-// StockInDialog will be imported once created in Task 11
-// For now define a stub so this file compiles
-function StockInDialogPlaceholder({
-  item,
-  shopId,
-  userId,
-  onClose,
-  onDone,
-}: {
-  item: StockItem
-  shopId: string
-  userId: string
-  onClose: () => void
-  onDone: () => void
-}) {
-  return null
-}
 
 export function StockPageClient({
   items,
@@ -44,7 +27,7 @@ export function StockPageClient({
     <>
       <StockTable items={items} onStockIn={setSelectedItem} />
       {selectedItem && (
-        <StockInDialogPlaceholder
+        <StockInDialog
           item={selectedItem}
           shopId={shopId}
           userId={userId}
