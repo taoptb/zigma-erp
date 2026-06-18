@@ -47,7 +47,7 @@ CREATE TABLE shop_invitations (
   shop_id      UUID NOT NULL REFERENCES shops(id) ON DELETE CASCADE,
   email        TEXT NOT NULL,
   role         user_role NOT NULL,
-  token        TEXT UNIQUE NOT NULL DEFAULT encode(gen_random_bytes(32), 'hex'),
+  token        TEXT UNIQUE NOT NULL DEFAULT replace(gen_random_uuid()::text || gen_random_uuid()::text, '-', ''),
   invited_by   UUID REFERENCES profiles(id),
   expires_at   TIMESTAMPTZ NOT NULL DEFAULT (NOW() + INTERVAL '7 days'),
   accepted_at  TIMESTAMPTZ,

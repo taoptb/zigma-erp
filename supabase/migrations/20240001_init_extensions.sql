@@ -1,1 +1,1 @@
-CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+-- Extensions (uuid-ossp and pgcrypto not needed; gen_random_uuid() is built-in)
