@@ -3,8 +3,8 @@ import type { FilmCalculationResult, FilmCalculationBreakdown, FilmPosition, Car
 interface TemplateRow {
   car_type: string
   position: string
-  length_m: string
-  margin_m: string
+  length_m: string | number
+  margin_m: string | number
 }
 
 export function calcFilm(

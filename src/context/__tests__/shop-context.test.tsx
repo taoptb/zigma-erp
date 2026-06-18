@@ -11,7 +11,7 @@ const mockShop = {
   phone: null,
   tax_id: null,
   logo_url: null,
-  vat_rate: '0.07',
+  vat_rate: 0.07,
   settings: {},
   created_at: '2024-01-01T00:00:00Z',
   updated_at: '2024-01-01T00:00:00Z',

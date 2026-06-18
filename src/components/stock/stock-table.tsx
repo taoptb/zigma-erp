@@ -48,7 +48,7 @@ export function StockTable({
           <p className="text-sm font-semibold text-orange-700 mb-2">⚠ สินค้าใกล้หมด {lowItems.length} รายการ</p>
           <div className="flex flex-wrap gap-2">
             {lowItems.map((item) => (
-              <span key={item.id} className={`text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_STYLES[item.status]}`}>
+              <span key={item.id} className={`text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_STYLES[item.status ?? 'adequate']}`}>
                 {item.name} ({item.quantity}/{item.min_quantity})
               </span>
             ))}
@@ -86,8 +86,8 @@ export function StockTable({
                   ฿{Number(item.selling_price).toLocaleString()}
                 </td>
                 <td className="px-4 py-3">
-                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_STYLES[item.status]}`}>
-                    {STATUS_LABELS[item.status]}
+                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_STYLES[item.status ?? 'adequate']}`}>
+                    {STATUS_LABELS[item.status ?? 'adequate']}
                   </span>
                 </td>
                 <td className="px-4 py-3 text-right">

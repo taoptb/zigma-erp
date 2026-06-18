@@ -71,7 +71,7 @@ export async function createClaim(
       job_id: input.jobId ?? null,
       insurance_company: input.insuranceCompany,
       policy_number: input.policyNumber ?? null,
-      claim_amount: input.claimAmount ? String(input.claimAmount) : null,
+      claim_amount: input.claimAmount ?? null,
       status: 'waiting_docs',
       notes: input.notes ?? null,
       created_by: createdBy,

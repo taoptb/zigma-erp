@@ -67,7 +67,7 @@ BEGIN
      'insurance_claim',     'claim',      12000, CURRENT_DATE + 2, v_user_id);
 
   -- ── Stock items ───────────────────────────────────────────
-  INSERT INTO stock_items (id, shop_id, sku, name, category, quantity, min_quantity, unit_cost, unit_price) VALUES
+  INSERT INTO stock_items (id, shop_id, product_code, name, category, quantity, min_quantity, cost_price, selling_price) VALUES
     (v_stock1_id, v_shop_id, 'GLS-FRT-001', 'กระจกหน้า Toyota Camry 2020-2023', 'glass',       3, 2, 2800, 3800),
     (v_stock2_id, v_shop_id, 'GLS-RR-001',  'กระจกหลัง Honda CR-V 2017-2022',   'glass',       1, 2, 2200, 3200),
     (v_stock3_id, v_shop_id, 'SEAL-001',    'ยางขอบกระจกมาตรฐาน (เมตร)',         'seal_rubber', 20, 5,   45,   80);
@@ -77,30 +77,30 @@ BEGIN
                           width_cm, total_length_m, remaining_length_m,
                           color_hex, min_length_alert_m, is_active)
   VALUES (v_roll1_id, v_shop_id, 'Solar VLT 35%', 'SolarGard', 'VLT 35% IR Cut 99%',
-          '152', '30', '22.5', '#1a1a2e', '3', true);
+          152, 30, 22.5, '#1a1a2e', 3, true);
 
 END $$;
 
 -- ── Global film templates (visible to all shops) ──────────────
 INSERT INTO film_templates (shop_id, car_type, position, length_m, margin_m) VALUES
-  (NULL, 'sedan_s', 'front',      '1.40', '0.15'),
-  (NULL, 'sedan_s', 'rear',       '1.20', '0.15'),
-  (NULL, 'sedan_s', 'side_front', '1.00', '0.15'),
-  (NULL, 'sedan_s', 'side_rear',  '1.00', '0.15'),
-  (NULL, 'sedan_m', 'front',      '1.50', '0.15'),
-  (NULL, 'sedan_m', 'rear',       '1.30', '0.15'),
-  (NULL, 'sedan_m', 'side_front', '1.10', '0.15'),
-  (NULL, 'sedan_m', 'side_rear',  '1.10', '0.15'),
-  (NULL, 'suv',     'front',      '1.60', '0.15'),
-  (NULL, 'suv',     'rear',       '1.40', '0.15'),
-  (NULL, 'suv',     'side_front', '1.20', '0.15'),
-  (NULL, 'suv',     'side_rear',  '1.20', '0.15'),
-  (NULL, 'pickup',  'front',      '1.50', '0.15'),
-  (NULL, 'pickup',  'rear',       '1.30', '0.15'),
-  (NULL, 'pickup',  'side_front', '1.00', '0.15'),
-  (NULL, 'pickup',  'side_rear',  '1.00', '0.15'),
-  (NULL, 'van',     'front',      '1.70', '0.15'),
-  (NULL, 'van',     'rear',       '1.50', '0.15'),
-  (NULL, 'van',     'side_front', '1.30', '0.15'),
-  (NULL, 'van',     'side_rear',  '1.30', '0.15')
+  (NULL, 'sedan_s', 'front',      1.40, 0.15),
+  (NULL, 'sedan_s', 'rear',       1.20, 0.15),
+  (NULL, 'sedan_s', 'side_front', 1.00, 0.15),
+  (NULL, 'sedan_s', 'side_rear',  1.00, 0.15),
+  (NULL, 'sedan_m', 'front',      1.50, 0.15),
+  (NULL, 'sedan_m', 'rear',       1.30, 0.15),
+  (NULL, 'sedan_m', 'side_front', 1.10, 0.15),
+  (NULL, 'sedan_m', 'side_rear',  1.10, 0.15),
+  (NULL, 'suv',     'front',      1.60, 0.15),
+  (NULL, 'suv',     'rear',       1.40, 0.15),
+  (NULL, 'suv',     'side_front', 1.20, 0.15),
+  (NULL, 'suv',     'side_rear',  1.20, 0.15),
+  (NULL, 'pickup',  'front',      1.50, 0.15),
+  (NULL, 'pickup',  'rear',       1.30, 0.15),
+  (NULL, 'pickup',  'side_front', 1.00, 0.15),
+  (NULL, 'pickup',  'side_rear',  1.00, 0.15),
+  (NULL, 'van',     'front',      1.70, 0.15),
+  (NULL, 'van',     'rear',       1.50, 0.15),
+  (NULL, 'van',     'side_front', 1.30, 0.15),
+  (NULL, 'van',     'side_rear',  1.30, 0.15)
 ON CONFLICT DO NOTHING;

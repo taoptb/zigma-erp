@@ -85,8 +85,8 @@ export async function createInvoice(
       billed_to_name: input.billedToName ?? null,
       billed_to_phone: input.billedToPhone ?? null,
       license_plate: input.licensePlate ?? null,
-      subtotal: String(subtotal),
-      vat_rate: String(vatRate),
+      subtotal,
+      vat_rate: vatRate,
       status: 'draft',
       notes: input.notes ?? null,
       issued_by: issuedBy,
@@ -100,8 +100,8 @@ export async function createInvoice(
     shop_id: shopId,
     invoice_id: invoice.id,
     description: i.description,
-    quantity: String(i.quantity),
-    unit_price: String(i.unitPrice),
+    quantity: i.quantity,
+    unit_price: i.unitPrice,
   }))
 
   const { error: itemsErr } = await supabase.from('invoice_items').insert(lineItems)

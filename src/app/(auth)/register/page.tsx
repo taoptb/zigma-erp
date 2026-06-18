@@ -26,46 +26,29 @@ export default function RegisterPage() {
     setLoading(true)
     setError(null)
 
-    const supabase = createClient()
-
-    // 1. Sign up
-    const { data: authData, error: signUpError } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { data: { display_name: displayName } },
+    // Call server-side API — uses service role key, bypasses RLS
+    const res = await fetch('/api/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password, displayName, shopName, shopPhone }),
     })
 
-    if (signUpError || !authData.user) {
-      setError(signUpError?.message ?? 'สมัครไม่สำเร็จ')
+    const json = await res.json()
+
+    if (!res.ok) {
+      setError(json.error ?? 'สมัครไม่สำเร็จ กรุณาลองใหม่')
       setLoading(false)
       return
     }
 
-    // 2. Create shop
-    const slug = shopName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') +
-      '-' + Date.now().toString(36)
+    // Sign in with the newly created credentials
+    const supabase = createClient()
+    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
 
-    const { data: shop, error: shopError } = await supabase
-      .from('shops')
-      .insert({ name: shopName, slug, phone: shopPhone })
-      .select()
-      .single()
-
-    if (shopError || !shop) {
-      setError('สร้างอู่ไม่สำเร็จ กรุณาลองใหม่')
+    if (signInError) {
+      setError('สร้างบัญชีสำเร็จแล้ว กรุณาเข้าสู่ระบบ')
       setLoading(false)
-      return
-    }
-
-    // 3. Link profile to shop with owner role
-    const { error: profileError } = await supabase
-      .from('profiles')
-      .update({ shop_id: shop.id, role: 'owner', display_name: displayName })
-      .eq('id', authData.user.id)
-
-    if (profileError) {
-      setError('สร้างบัญชีสำเร็จ แต่ตั้งค่าโปรไฟล์ไม่สำเร็จ กรุณาติดต่อฝ่ายสนับสนุน')
-      setLoading(false)
+      router.push('/login')
       return
     }
 
@@ -100,7 +83,7 @@ export default function RegisterPage() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">รหัสผ่าน</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">รหัสผ่าน (อย่างน้อย 8 ตัว)</label>
             <input
               type="password"
               value={password}

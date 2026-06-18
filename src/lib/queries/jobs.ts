@@ -139,7 +139,7 @@ export async function createJob(
       customer_id: customerId,
       job_type: input.jobType,
       status: 'pending',
-      price: String(input.price),
+      price: input.price,
       scheduled_date: input.scheduledDate ?? null,
       notes: input.notes ?? null,
       is_insurance_claim: input.isInsuranceClaim ?? false,

@@ -1,408 +1,1543 @@
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
+
 export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "14.5"
+  }
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
-      shops: {
+      claim_documents: {
         Row: {
-          id: string
-          name: string
-          slug: string
-          address: string | null
-          phone: string | null
-          tax_id: string | null
-          logo_url: string | null
-          vat_rate: string
-          settings: Record<string, unknown>
+          claim_id: string
           created_at: string
-          updated_at: string
-          deleted_at: string | null
-        }
-        Insert: Partial<Database['public']['Tables']['shops']['Row']> & { name: string; slug: string }
-        Update: Partial<Database['public']['Tables']['shops']['Row']>
-        Relationships: []
-      }
-      profiles: {
-        Row: {
+          document_name: string
+          file_url: string | null
           id: string
-          shop_id: string | null
-          role: Database['public']['Enums']['user_role']
-          display_name: string
-          phone: string | null
-          avatar_color: string
-          is_active: boolean
-          created_at: string
-          updated_at: string
-        }
-        Insert: Partial<Database['public']['Tables']['profiles']['Row']> & { id: string; display_name: string }
-        Update: Partial<Database['public']['Tables']['profiles']['Row']>
-        Relationships: []
-      }
-      shop_invitations: {
-        Row: {
-          id: string
+          is_submitted: boolean
+          notes: string | null
           shop_id: string
-          email: string
-          role: Database['public']['Enums']['user_role']
-          token: string
-          invited_by: string | null
-          expires_at: string
-          accepted_at: string | null
-          created_at: string
+          submitted_at: string | null
         }
-        Insert: Partial<Database['public']['Tables']['shop_invitations']['Row']> & { shop_id: string; email: string; role: Database['public']['Enums']['user_role'] }
-        Update: Partial<Database['public']['Tables']['shop_invitations']['Row']>
-        Relationships: []
+        Insert: {
+          claim_id: string
+          created_at?: string
+          document_name: string
+          file_url?: string | null
+          id?: string
+          is_submitted?: boolean
+          notes?: string | null
+          shop_id: string
+          submitted_at?: string | null
+        }
+        Update: {
+          claim_id?: string
+          created_at?: string
+          document_name?: string
+          file_url?: string | null
+          id?: string
+          is_submitted?: boolean
+          notes?: string | null
+          shop_id?: string
+          submitted_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "claim_documents_claim_id_fkey"
+            columns: ["claim_id"]
+            isOneToOne: false
+            referencedRelation: "insurance_claims"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claim_documents_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       customers: {
         Row: {
-          id: string
-          shop_id: string
-          name: string
-          phone: string | null
+          created_at: string
+          deleted_at: string | null
           email: string | null
+          id: string
+          name: string
           notes: string | null
-          created_at: string
+          phone: string | null
+          shop_id: string
           updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          deleted_at?: string | null
+          email?: string | null
+          id?: string
+          name: string
+          notes?: string | null
+          phone?: string | null
+          shop_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          deleted_at?: string | null
+          email?: string | null
+          id?: string
+          name?: string
+          notes?: string | null
+          phone?: string | null
+          shop_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customers_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      film_cuts: {
+        Row: {
+          car_type: string
+          cut_at: string
+          cut_by: string | null
+          film_roll_id: string
+          id: string
+          job_id: string | null
+          length_used_m: number
+          notes: string | null
+          positions: string[]
+          remaining_after_m: number
+          shop_id: string
+        }
+        Insert: {
+          car_type: string
+          cut_at?: string
+          cut_by?: string | null
+          film_roll_id: string
+          id?: string
+          job_id?: string | null
+          length_used_m: number
+          notes?: string | null
+          positions: string[]
+          remaining_after_m: number
+          shop_id: string
+        }
+        Update: {
+          car_type?: string
+          cut_at?: string
+          cut_by?: string | null
+          film_roll_id?: string
+          id?: string
+          job_id?: string | null
+          length_used_m?: number
+          notes?: string | null
+          positions?: string[]
+          remaining_after_m?: number
+          shop_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "film_cuts_cut_by_fkey"
+            columns: ["cut_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "film_cuts_film_roll_id_fkey"
+            columns: ["film_roll_id"]
+            isOneToOne: false
+            referencedRelation: "film_rolls"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "film_cuts_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "film_cuts_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      film_rolls: {
+        Row: {
+          brand: string | null
+          color_hex: string
+          created_at: string
           deleted_at: string | null
-        }
-        Insert: Partial<Database['public']['Tables']['customers']['Row']> & { shop_id: string; name: string }
-        Update: Partial<Database['public']['Tables']['customers']['Row']>
-        Relationships: []
-      }
-      vehicles: {
-        Row: {
           id: string
+          is_active: boolean
+          min_length_alert_m: number
+          name: string
+          remaining_length_m: number
           shop_id: string
-          customer_id: string | null
-          license_plate: string
-          make: string
-          model: string
-          year: number | null
-          color: string | null
-          notes: string | null
-          created_at: string
+          specification: string | null
+          total_length_m: number
           updated_at: string
+          width_cm: number
         }
-        Insert: Partial<Database['public']['Tables']['vehicles']['Row']> & { shop_id: string; license_plate: string; make: string; model: string }
-        Update: Partial<Database['public']['Tables']['vehicles']['Row']>
-        Relationships: []
-      }
-      jobs: {
-        Row: {
-          id: string
+        Insert: {
+          brand?: string | null
+          color_hex?: string
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          is_active?: boolean
+          min_length_alert_m?: number
+          name: string
+          remaining_length_m: number
           shop_id: string
-          job_number: string
-          vehicle_id: string | null
-          customer_id: string | null
-          technician_id: string | null
-          job_type: Database['public']['Enums']['job_type']
-          status: Database['public']['Enums']['job_status']
-          price: string
-          notes: string | null
-          scheduled_date: string | null
-          received_at: string | null
-          completed_at: string | null
-          delivered_at: string | null
-          odometer_in: number | null
-          progress: number
-          insurance_company: string | null
-          is_insurance_claim: boolean
+          specification?: string | null
+          total_length_m: number
+          updated_at?: string
+          width_cm: number
+        }
+        Update: {
+          brand?: string | null
+          color_hex?: string
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          is_active?: boolean
+          min_length_alert_m?: number
+          name?: string
+          remaining_length_m?: number
+          shop_id?: string
+          specification?: string | null
+          total_length_m?: number
+          updated_at?: string
+          width_cm?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "film_rolls_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      film_templates: {
+        Row: {
+          car_type: string
+          id: string
+          length_m: number
+          margin_m: number
+          position: string
+          shop_id: string | null
+        }
+        Insert: {
+          car_type: string
+          id?: string
+          length_m: number
+          margin_m?: number
+          position: string
+          shop_id?: string | null
+        }
+        Update: {
+          car_type?: string
+          id?: string
+          length_m?: number
+          margin_m?: number
+          position?: string
+          shop_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "film_templates_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      insurance_claims: {
+        Row: {
+          approved_amount: number | null
+          approved_at: string | null
+          claim_amount: number | null
+          claim_number: string
+          created_at: string
           created_by: string | null
-          created_at: string
-          updated_at: string
           deleted_at: string | null
-        }
-        Insert: Partial<Database['public']['Tables']['jobs']['Row']> & { shop_id: string; job_number: string }
-        Update: Partial<Database['public']['Tables']['jobs']['Row']>
-        Relationships: []
-      }
-      job_status_history: {
-        Row: {
           id: string
+          insurance_company: string
+          job_id: string | null
+          job_type: Database["public"]["Enums"]["job_type"]
+          license_plate: string
+          notes: string | null
+          paid_at: string | null
+          policy_number: string | null
+          shop_id: string
+          status: Database["public"]["Enums"]["claim_status"]
+          submitted_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          approved_amount?: number | null
+          approved_at?: string | null
+          claim_amount?: number | null
+          claim_number: string
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          insurance_company: string
+          job_id?: string | null
+          job_type: Database["public"]["Enums"]["job_type"]
+          license_plate: string
+          notes?: string | null
+          paid_at?: string | null
+          policy_number?: string | null
+          shop_id: string
+          status?: Database["public"]["Enums"]["claim_status"]
+          submitted_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          approved_amount?: number | null
+          approved_at?: string | null
+          claim_amount?: number | null
+          claim_number?: string
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          insurance_company?: string
+          job_id?: string | null
+          job_type?: Database["public"]["Enums"]["job_type"]
+          license_plate?: string
+          notes?: string | null
+          paid_at?: string | null
+          policy_number?: string | null
+          shop_id?: string
+          status?: Database["public"]["Enums"]["claim_status"]
+          submitted_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "insurance_claims_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "insurance_claims_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "insurance_claims_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      invoice_items: {
+        Row: {
+          description: string
+          id: string
+          invoice_id: string
+          line_total: number | null
+          quantity: number
+          shop_id: string
+          sort_order: number
+          stock_item_id: string | null
+          unit_price: number
+        }
+        Insert: {
+          description: string
+          id?: string
+          invoice_id: string
+          line_total?: number | null
+          quantity?: number
+          shop_id: string
+          sort_order?: number
+          stock_item_id?: string | null
+          unit_price: number
+        }
+        Update: {
+          description?: string
+          id?: string
+          invoice_id?: string
+          line_total?: number | null
+          quantity?: number
+          shop_id?: string
+          sort_order?: number
+          stock_item_id?: string | null
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoice_items_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoice_items_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoice_items_stock_item_id_fkey"
+            columns: ["stock_item_id"]
+            isOneToOne: false
+            referencedRelation: "stock_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      invoices: {
+        Row: {
+          billed_to_name: string | null
+          billed_to_phone: string | null
+          claim_id: string | null
+          created_at: string
+          customer_id: string | null
+          deleted_at: string | null
+          id: string
+          invoice_number: string
+          issued_at: string | null
+          issued_by: string | null
+          job_id: string | null
+          license_plate: string | null
+          notes: string | null
+          paid_amount: number | null
+          paid_at: string | null
+          payment_method: string | null
+          shop_id: string
+          status: Database["public"]["Enums"]["invoice_status"]
+          subtotal: number
+          total: number | null
+          updated_at: string
+          vat_amount: number | null
+          vat_rate: number
+        }
+        Insert: {
+          billed_to_name?: string | null
+          billed_to_phone?: string | null
+          claim_id?: string | null
+          created_at?: string
+          customer_id?: string | null
+          deleted_at?: string | null
+          id?: string
+          invoice_number: string
+          issued_at?: string | null
+          issued_by?: string | null
+          job_id?: string | null
+          license_plate?: string | null
+          notes?: string | null
+          paid_amount?: number | null
+          paid_at?: string | null
+          payment_method?: string | null
+          shop_id: string
+          status?: Database["public"]["Enums"]["invoice_status"]
+          subtotal?: number
+          total?: number | null
+          updated_at?: string
+          vat_amount?: number | null
+          vat_rate?: number
+        }
+        Update: {
+          billed_to_name?: string | null
+          billed_to_phone?: string | null
+          claim_id?: string | null
+          created_at?: string
+          customer_id?: string | null
+          deleted_at?: string | null
+          id?: string
+          invoice_number?: string
+          issued_at?: string | null
+          issued_by?: string | null
+          job_id?: string | null
+          license_plate?: string | null
+          notes?: string | null
+          paid_amount?: number | null
+          paid_at?: string | null
+          payment_method?: string | null
+          shop_id?: string
+          status?: Database["public"]["Enums"]["invoice_status"]
+          subtotal?: number
+          total?: number | null
+          updated_at?: string
+          vat_amount?: number | null
+          vat_rate?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoices_claim_id_fkey"
+            columns: ["claim_id"]
+            isOneToOne: false
+            referencedRelation: "insurance_claims"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_issued_by_fkey"
+            columns: ["issued_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      job_assignments: {
+        Row: {
+          assigned_by: string | null
+          created_at: string
+          due_date: string | null
+          id: string
+          is_primary: boolean
           job_id: string
           shop_id: string
-          from_status: Database['public']['Enums']['job_status'] | null
-          to_status: Database['public']['Enums']['job_status']
-          changed_by: string | null
-          note: string | null
-          created_at: string
+          technician_id: string
         }
-        Insert: Partial<Database['public']['Tables']['job_status_history']['Row']> & { job_id: string; shop_id: string; to_status: Database['public']['Enums']['job_status'] }
-        Update: Partial<Database['public']['Tables']['job_status_history']['Row']>
-        Relationships: []
+        Insert: {
+          assigned_by?: string | null
+          created_at?: string
+          due_date?: string | null
+          id?: string
+          is_primary?: boolean
+          job_id: string
+          shop_id: string
+          technician_id: string
+        }
+        Update: {
+          assigned_by?: string | null
+          created_at?: string
+          due_date?: string | null
+          id?: string
+          is_primary?: boolean
+          job_id?: string
+          shop_id?: string
+          technician_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_assignments_assigned_by_fkey"
+            columns: ["assigned_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_assignments_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_assignments_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_assignments_technician_id_fkey"
+            columns: ["technician_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       job_damage_checklist: {
         Row: {
+          created_at: string
           id: string
-          job_id: string
-          shop_id: string
-          item: string
           is_damaged: boolean
+          item: string
+          job_id: string
           notes: string | null
           photo_urls: string[]
-          created_at: string
+          shop_id: string
         }
-        Insert: Partial<Database['public']['Tables']['job_damage_checklist']['Row']> & { job_id: string; shop_id: string; item: string }
-        Update: Partial<Database['public']['Tables']['job_damage_checklist']['Row']>
+        Insert: {
+          created_at?: string
+          id?: string
+          is_damaged?: boolean
+          item: string
+          job_id: string
+          notes?: string | null
+          photo_urls?: string[]
+          shop_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_damaged?: boolean
+          item?: string
+          job_id?: string
+          notes?: string | null
+          photo_urls?: string[]
+          shop_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_damage_checklist_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_damage_checklist_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      job_status_history: {
+        Row: {
+          changed_by: string | null
+          created_at: string
+          from_status: Database["public"]["Enums"]["job_status"] | null
+          id: string
+          job_id: string
+          note: string | null
+          shop_id: string
+          to_status: Database["public"]["Enums"]["job_status"]
+        }
+        Insert: {
+          changed_by?: string | null
+          created_at?: string
+          from_status?: Database["public"]["Enums"]["job_status"] | null
+          id?: string
+          job_id: string
+          note?: string | null
+          shop_id: string
+          to_status: Database["public"]["Enums"]["job_status"]
+        }
+        Update: {
+          changed_by?: string | null
+          created_at?: string
+          from_status?: Database["public"]["Enums"]["job_status"] | null
+          id?: string
+          job_id?: string
+          note?: string | null
+          shop_id?: string
+          to_status?: Database["public"]["Enums"]["job_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_status_history_changed_by_fkey"
+            columns: ["changed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_status_history_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_status_history_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      jobs: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          created_by: string | null
+          customer_id: string | null
+          deleted_at: string | null
+          delivered_at: string | null
+          id: string
+          insurance_company: string | null
+          is_insurance_claim: boolean
+          job_number: string
+          job_type: Database["public"]["Enums"]["job_type"]
+          notes: string | null
+          odometer_in: number | null
+          price: number
+          progress: number
+          received_at: string | null
+          scheduled_date: string | null
+          shop_id: string
+          status: Database["public"]["Enums"]["job_status"]
+          technician_id: string | null
+          updated_at: string
+          vehicle_id: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          deleted_at?: string | null
+          delivered_at?: string | null
+          id?: string
+          insurance_company?: string | null
+          is_insurance_claim?: boolean
+          job_number: string
+          job_type?: Database["public"]["Enums"]["job_type"]
+          notes?: string | null
+          odometer_in?: number | null
+          price?: number
+          progress?: number
+          received_at?: string | null
+          scheduled_date?: string | null
+          shop_id: string
+          status?: Database["public"]["Enums"]["job_status"]
+          technician_id?: string | null
+          updated_at?: string
+          vehicle_id?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          deleted_at?: string | null
+          delivered_at?: string | null
+          id?: string
+          insurance_company?: string | null
+          is_insurance_claim?: boolean
+          job_number?: string
+          job_type?: Database["public"]["Enums"]["job_type"]
+          notes?: string | null
+          odometer_in?: number | null
+          price?: number
+          progress?: number
+          received_at?: string | null
+          scheduled_date?: string | null
+          shop_id?: string
+          status?: Database["public"]["Enums"]["job_status"]
+          technician_id?: string | null
+          updated_at?: string
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "jobs_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "jobs_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "jobs_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "jobs_technician_id_fkey"
+            columns: ["technician_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "jobs_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notification_logs: {
+        Row: {
+          channel: Database["public"]["Enums"]["notification_channel"]
+          created_at: string
+          error_msg: string | null
+          event: Database["public"]["Enums"]["notification_event"]
+          id: string
+          payload: Json
+          recipient: string
+          sent_at: string | null
+          shop_id: string
+          status: string
+        }
+        Insert: {
+          channel: Database["public"]["Enums"]["notification_channel"]
+          created_at?: string
+          error_msg?: string | null
+          event: Database["public"]["Enums"]["notification_event"]
+          id?: string
+          payload?: Json
+          recipient: string
+          sent_at?: string | null
+          shop_id: string
+          status?: string
+        }
+        Update: {
+          channel?: Database["public"]["Enums"]["notification_channel"]
+          created_at?: string
+          error_msg?: string | null
+          event?: Database["public"]["Enums"]["notification_event"]
+          id?: string
+          payload?: Json
+          recipient?: string
+          sent_at?: string | null
+          shop_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notification_logs_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notification_rules: {
+        Row: {
+          channel: Database["public"]["Enums"]["notification_channel"]
+          created_at: string
+          event: Database["public"]["Enums"]["notification_event"]
+          id: string
+          is_enabled: boolean
+          shop_id: string
+          template: string | null
+        }
+        Insert: {
+          channel: Database["public"]["Enums"]["notification_channel"]
+          created_at?: string
+          event: Database["public"]["Enums"]["notification_event"]
+          id?: string
+          is_enabled?: boolean
+          shop_id: string
+          template?: string | null
+        }
+        Update: {
+          channel?: Database["public"]["Enums"]["notification_channel"]
+          created_at?: string
+          event?: Database["public"]["Enums"]["notification_event"]
+          id?: string
+          is_enabled?: boolean
+          shop_id?: string
+          template?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notification_rules_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_color: string
+          created_at: string
+          display_name: string
+          id: string
+          is_active: boolean
+          phone: string | null
+          role: Database["public"]["Enums"]["user_role"]
+          shop_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          avatar_color?: string
+          created_at?: string
+          display_name: string
+          id: string
+          is_active?: boolean
+          phone?: string | null
+          role?: Database["public"]["Enums"]["user_role"]
+          shop_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          avatar_color?: string
+          created_at?: string
+          display_name?: string
+          id?: string
+          is_active?: boolean
+          phone?: string | null
+          role?: Database["public"]["Enums"]["user_role"]
+          shop_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shop_invitations: {
+        Row: {
+          accepted_at: string | null
+          created_at: string
+          email: string
+          expires_at: string
+          id: string
+          invited_by: string | null
+          role: Database["public"]["Enums"]["user_role"]
+          shop_id: string
+          token: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          created_at?: string
+          email: string
+          expires_at?: string
+          id?: string
+          invited_by?: string | null
+          role: Database["public"]["Enums"]["user_role"]
+          shop_id: string
+          token?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          created_at?: string
+          email?: string
+          expires_at?: string
+          id?: string
+          invited_by?: string | null
+          role?: Database["public"]["Enums"]["user_role"]
+          shop_id?: string
+          token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shop_invitations_invited_by_fkey"
+            columns: ["invited_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shop_invitations_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shops: {
+        Row: {
+          address: string | null
+          created_at: string
+          deleted_at: string | null
+          id: string
+          logo_url: string | null
+          name: string
+          phone: string | null
+          settings: Json
+          slug: string
+          tax_id: string | null
+          updated_at: string
+          vat_rate: number
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          logo_url?: string | null
+          name: string
+          phone?: string | null
+          settings?: Json
+          slug: string
+          tax_id?: string | null
+          updated_at?: string
+          vat_rate?: number
+        }
+        Update: {
+          address?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          logo_url?: string | null
+          name?: string
+          phone?: string | null
+          settings?: Json
+          slug?: string
+          tax_id?: string | null
+          updated_at?: string
+          vat_rate?: number
+        }
         Relationships: []
       }
       stock_items: {
         Row: {
+          category: Database["public"]["Enums"]["stock_category"]
+          cost_price: number
+          created_at: string
+          deleted_at: string | null
           id: string
-          shop_id: string
-          product_code: string
+          location_note: string | null
+          min_quantity: number
           name: string
           name_en: string | null
-          category: Database['public']['Enums']['stock_category']
+          position: Database["public"]["Enums"]["glass_position"] | null
+          product_code: string
+          quantity: number
+          selling_price: number
+          shop_id: string
+          status: Database["public"]["Enums"]["stock_status"] | null
+          supplier_name: string | null
+          updated_at: string
           vehicle_make: string | null
           vehicle_model: string | null
-          position: Database['public']['Enums']['glass_position'] | null
-          quantity: number
-          min_quantity: number
-          cost_price: string
-          selling_price: string
-          supplier_name: string | null
-          location_note: string | null
-          status: Database['public']['Enums']['stock_status']
-          created_at: string
-          updated_at: string
-          deleted_at: string | null
         }
-        Insert: Partial<Database['public']['Tables']['stock_items']['Row']> & { shop_id: string; product_code: string; name: string; status?: never }
-        Update: Partial<Database['public']['Tables']['stock_items']['Row']> & { status?: never }
-        Relationships: []
+        Insert: {
+          category?: Database["public"]["Enums"]["stock_category"]
+          cost_price?: number
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          location_note?: string | null
+          min_quantity?: number
+          name: string
+          name_en?: string | null
+          position?: Database["public"]["Enums"]["glass_position"] | null
+          product_code: string
+          quantity?: number
+          selling_price?: number
+          shop_id: string
+          status?: Database["public"]["Enums"]["stock_status"] | null
+          supplier_name?: string | null
+          updated_at?: string
+          vehicle_make?: string | null
+          vehicle_model?: string | null
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["stock_category"]
+          cost_price?: number
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          location_note?: string | null
+          min_quantity?: number
+          name?: string
+          name_en?: string | null
+          position?: Database["public"]["Enums"]["glass_position"] | null
+          product_code?: string
+          quantity?: number
+          selling_price?: number
+          shop_id?: string
+          status?: Database["public"]["Enums"]["stock_status"] | null
+          supplier_name?: string | null
+          updated_at?: string
+          vehicle_make?: string | null
+          vehicle_model?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stock_items_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       stock_movements: {
         Row: {
+          created_at: string
+          created_by: string | null
           id: string
+          job_id: string | null
+          movement_type: string
+          quantity_after: number
+          quantity_delta: number
+          reference: string | null
           shop_id: string
           stock_item_id: string
-          job_id: string | null
-          movement_type: 'in' | 'out' | 'adjustment'
-          quantity_delta: number
-          quantity_after: number
-          unit_cost: string | null
           supplier_name: string | null
-          reference: string | null
-          created_by: string | null
-          created_at: string
+          unit_cost: number | null
         }
-        Insert: Partial<Database['public']['Tables']['stock_movements']['Row']> & { shop_id: string; stock_item_id: string; movement_type: 'in' | 'out' | 'adjustment'; quantity_delta: number; quantity_after: number }
-        Update: Partial<Database['public']['Tables']['stock_movements']['Row']>
-        Relationships: []
-      }
-      film_rolls: {
-        Row: {
-          id: string
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          job_id?: string | null
+          movement_type: string
+          quantity_after: number
+          quantity_delta: number
+          reference?: string | null
           shop_id: string
-          name: string
-          brand: string | null
-          specification: string | null
-          width_cm: string
-          total_length_m: string
-          remaining_length_m: string
-          color_hex: string
-          min_length_alert_m: string
-          is_active: boolean
-          created_at: string
-          updated_at: string
-          deleted_at: string | null
+          stock_item_id: string
+          supplier_name?: string | null
+          unit_cost?: number | null
         }
-        Insert: Partial<Database['public']['Tables']['film_rolls']['Row']> & { shop_id: string; name: string; width_cm: string; total_length_m: string; remaining_length_m: string }
-        Update: Partial<Database['public']['Tables']['film_rolls']['Row']>
-        Relationships: []
-      }
-      film_templates: {
-        Row: {
-          id: string
-          shop_id: string | null
-          car_type: string
-          position: string
-          length_m: string
-          margin_m: string
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          job_id?: string | null
+          movement_type?: string
+          quantity_after?: number
+          quantity_delta?: number
+          reference?: string | null
+          shop_id?: string
+          stock_item_id?: string
+          supplier_name?: string | null
+          unit_cost?: number | null
         }
-        Insert: Partial<Database['public']['Tables']['film_templates']['Row']> & { car_type: string; position: string; length_m: string }
-        Update: Partial<Database['public']['Tables']['film_templates']['Row']>
-        Relationships: []
-      }
-      film_cuts: {
-        Row: {
-          id: string
-          shop_id: string
-          film_roll_id: string
-          job_id: string | null
-          car_type: string
-          positions: string[]
-          length_used_m: string
-          remaining_after_m: string
-          cut_by: string | null
-          cut_at: string
-          notes: string | null
-        }
-        Insert: Partial<Database['public']['Tables']['film_cuts']['Row']> & { shop_id: string; film_roll_id: string; car_type: string; positions: string[]; length_used_m: string; remaining_after_m: string }
-        Update: Partial<Database['public']['Tables']['film_cuts']['Row']>
-        Relationships: []
-      }
-      insurance_claims: {
-        Row: {
-          id: string
-          shop_id: string
-          job_id: string | null
-          claim_number: string
-          insurance_company: string
-          policy_number: string | null
-          license_plate: string
-          job_type: Database['public']['Enums']['job_type']
-          claim_amount: string | null
-          approved_amount: string | null
-          status: Database['public']['Enums']['claim_status']
-          notes: string | null
-          submitted_at: string | null
-          approved_at: string | null
-          paid_at: string | null
-          created_by: string | null
-          created_at: string
-          updated_at: string
-          deleted_at: string | null
-        }
-        Insert: Partial<Database['public']['Tables']['insurance_claims']['Row']> & { shop_id: string; claim_number: string; insurance_company: string; license_plate: string; job_type: Database['public']['Enums']['job_type'] }
-        Update: Partial<Database['public']['Tables']['insurance_claims']['Row']>
-        Relationships: []
-      }
-      claim_documents: {
-        Row: {
-          id: string
-          shop_id: string
-          claim_id: string
-          document_name: string
-          is_submitted: boolean
-          file_url: string | null
-          submitted_at: string | null
-          notes: string | null
-          created_at: string
-        }
-        Insert: Partial<Database['public']['Tables']['claim_documents']['Row']> & { shop_id: string; claim_id: string; document_name: string }
-        Update: Partial<Database['public']['Tables']['claim_documents']['Row']>
-        Relationships: []
-      }
-      invoices: {
-        Row: {
-          id: string
-          shop_id: string
-          invoice_number: string
-          job_id: string | null
-          claim_id: string | null
-          customer_id: string | null
-          billed_to_name: string | null
-          billed_to_phone: string | null
-          license_plate: string | null
-          subtotal: string
-          vat_rate: string
-          vat_amount: string
-          total: string
-          status: Database['public']['Enums']['invoice_status']
-          paid_at: string | null
-          paid_amount: string | null
-          payment_method: string | null
-          notes: string | null
-          issued_by: string | null
-          issued_at: string | null
-          created_at: string
-          updated_at: string
-          deleted_at: string | null
-        }
-        Insert: Partial<Database['public']['Tables']['invoices']['Row']> & { shop_id: string; invoice_number: string; vat_amount?: never; total?: never }
-        Update: Partial<Database['public']['Tables']['invoices']['Row']> & { vat_amount?: never; total?: never }
-        Relationships: []
-      }
-      invoice_items: {
-        Row: {
-          id: string
-          shop_id: string
-          invoice_id: string
-          stock_item_id: string | null
-          description: string
-          quantity: string
-          unit_price: string
-          line_total: string
-          sort_order: number
-        }
-        Insert: Partial<Database['public']['Tables']['invoice_items']['Row']> & { shop_id: string; invoice_id: string; description: string; unit_price: string; line_total?: never }
-        Update: Partial<Database['public']['Tables']['invoice_items']['Row']> & { line_total?: never }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "stock_movements_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_movements_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_movements_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_movements_stock_item_id_fkey"
+            columns: ["stock_item_id"]
+            isOneToOne: false
+            referencedRelation: "stock_items"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       technician_capacity: {
         Row: {
           id: string
+          is_available: boolean
+          max_jobs: number
           shop_id: string
           technician_id: string
           work_date: string
-          max_jobs: number
-          is_available: boolean
         }
-        Insert: Partial<Database['public']['Tables']['technician_capacity']['Row']> & { shop_id: string; technician_id: string }
-        Update: Partial<Database['public']['Tables']['technician_capacity']['Row']>
-        Relationships: []
-      }
-      job_assignments: {
-        Row: {
-          id: string
+        Insert: {
+          id?: string
+          is_available?: boolean
+          max_jobs?: number
           shop_id: string
-          job_id: string
           technician_id: string
-          assigned_by: string | null
-          due_date: string | null
-          is_primary: boolean
-          created_at: string
+          work_date?: string
         }
-        Insert: Partial<Database['public']['Tables']['job_assignments']['Row']> & { shop_id: string; job_id: string; technician_id: string }
-        Update: Partial<Database['public']['Tables']['job_assignments']['Row']>
-        Relationships: []
+        Update: {
+          id?: string
+          is_available?: boolean
+          max_jobs?: number
+          shop_id?: string
+          technician_id?: string
+          work_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "technician_capacity_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "technician_capacity_technician_id_fkey"
+            columns: ["technician_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
-      notification_logs: {
+      vehicles: {
         Row: {
-          id: string
-          shop_id: string
-          event: Database['public']['Enums']['notification_event']
-          channel: Database['public']['Enums']['notification_channel']
-          recipient: string
-          payload: Record<string, unknown>
-          status: 'pending' | 'sent' | 'failed'
-          error_msg: string | null
-          sent_at: string | null
+          color: string | null
           created_at: string
-        }
-        Insert: Partial<Database['public']['Tables']['notification_logs']['Row']> & { shop_id: string; event: Database['public']['Enums']['notification_event']; channel: Database['public']['Enums']['notification_channel']; recipient: string }
-        Update: Partial<Database['public']['Tables']['notification_logs']['Row']>
-        Relationships: []
-      }
-      notification_rules: {
-        Row: {
+          customer_id: string | null
           id: string
+          license_plate: string
+          make: string
+          model: string
+          notes: string | null
           shop_id: string
-          event: Database['public']['Enums']['notification_event']
-          channel: Database['public']['Enums']['notification_channel']
-          is_enabled: boolean
-          template: string | null
-          created_at: string
+          updated_at: string
+          year: number | null
         }
-        Insert: Partial<Database['public']['Tables']['notification_rules']['Row']> & { shop_id: string; event: Database['public']['Enums']['notification_event']; channel: Database['public']['Enums']['notification_channel'] }
-        Update: Partial<Database['public']['Tables']['notification_rules']['Row']>
-        Relationships: []
+        Insert: {
+          color?: string | null
+          created_at?: string
+          customer_id?: string | null
+          id?: string
+          license_plate: string
+          make: string
+          model: string
+          notes?: string | null
+          shop_id: string
+          updated_at?: string
+          year?: number | null
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          customer_id?: string | null
+          id?: string
+          license_plate?: string
+          make?: string
+          model?: string
+          notes?: string | null
+          shop_id?: string
+          updated_at?: string
+          year?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicles_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicles_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
-    Views: Record<string, never>
-    Functions: Record<string, never>
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      auth_role: {
+        Args: never
+        Returns: Database["public"]["Enums"]["user_role"]
+      }
+      auth_shop_id: { Args: never; Returns: string }
+    }
     Enums: {
-      user_role: 'owner' | 'manager' | 'technician' | 'accountant'
-      job_status: 'quote' | 'pending' | 'in_progress' | 'waiting_parts' | 'claim' | 'done_waiting' | 'delivered' | 'cancelled'
-      job_type: 'windshield_replace' | 'side_glass_replace' | 'rear_glass_replace' | 'film_tint' | 'crack_repair' | 'insurance_claim' | 'other'
-      glass_position: 'front' | 'side_left' | 'side_right' | 'rear'
-      stock_status: 'adequate' | 'low' | 'near_out' | 'out_of_stock'
-      stock_category: 'glass' | 'film' | 'seal_rubber' | 'tool' | 'other'
-      claim_status: 'waiting_docs' | 'in_progress' | 'approved' | 'rejected' | 'paid'
-      invoice_status: 'draft' | 'pending_payment' | 'paid' | 'waiting_insurance' | 'cancelled'
-      notification_channel: 'sms' | 'line' | 'in_app'
-      notification_event: 'job_created' | 'job_status_changed' | 'job_completed' | 'claim_status_changed' | 'stock_low' | 'invoice_issued' | 'payment_received'
+      claim_status:
+        | "waiting_docs"
+        | "in_progress"
+        | "approved"
+        | "rejected"
+        | "paid"
+      glass_position: "front" | "side_left" | "side_right" | "rear"
+      invoice_status:
+        | "draft"
+        | "pending_payment"
+        | "paid"
+        | "waiting_insurance"
+        | "cancelled"
+      job_status:
+        | "quote"
+        | "pending"
+        | "in_progress"
+        | "waiting_parts"
+        | "claim"
+        | "done_waiting"
+        | "delivered"
+        | "cancelled"
+      job_type:
+        | "windshield_replace"
+        | "side_glass_replace"
+        | "rear_glass_replace"
+        | "film_tint"
+        | "crack_repair"
+        | "insurance_claim"
+        | "other"
+      notification_channel: "sms" | "line" | "in_app"
+      notification_event:
+        | "job_created"
+        | "job_status_changed"
+        | "job_completed"
+        | "claim_status_changed"
+        | "stock_low"
+        | "invoice_issued"
+        | "payment_received"
+      stock_category: "glass" | "film" | "seal_rubber" | "tool" | "other"
+      stock_status: "adequate" | "low" | "near_out" | "out_of_stock"
+      user_role: "owner" | "manager" | "technician" | "accountant"
+    }
+    CompositeTypes: {
+      [_ in never]: never
     }
   }
 }
+
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
+
+export type Tables<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R
+    }
+    ? R
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
+    : never
+
+export type TablesInsert<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I
+    }
+    ? I
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I
+      }
+      ? I
+      : never
+    : never
+
+export type TablesUpdate<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U
+    }
+    ? U
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U
+      }
+      ? U
+      : never
+    : never
+
+export type Enums<
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
+  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    : never = never,
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof DatabaseWithoutInternals },
+  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never = never,
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never
+
+export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
+  public: {
+    Enums: {
+      claim_status: [
+        "waiting_docs",
+        "in_progress",
+        "approved",
+        "rejected",
+        "paid",
+      ],
+      glass_position: ["front", "side_left", "side_right", "rear"],
+      invoice_status: [
+        "draft",
+        "pending_payment",
+        "paid",
+        "waiting_insurance",
+        "cancelled",
+      ],
+      job_status: [
+        "quote",
+        "pending",
+        "in_progress",
+        "waiting_parts",
+        "claim",
+        "done_waiting",
+        "delivered",
+        "cancelled",
+      ],
+      job_type: [
+        "windshield_replace",
+        "side_glass_replace",
+        "rear_glass_replace",
+        "film_tint",
+        "crack_repair",
+        "insurance_claim",
+        "other",
+      ],
+      notification_channel: ["sms", "line", "in_app"],
+      notification_event: [
+        "job_created",
+        "job_status_changed",
+        "job_completed",
+        "claim_status_changed",
+        "stock_low",
+        "invoice_issued",
+        "payment_received",
+      ],
+      stock_category: ["glass", "film", "seal_rubber", "tool", "other"],
+      stock_status: ["adequate", "low", "near_out", "out_of_stock"],
+      user_role: ["owner", "manager", "technician", "accountant"],
+    },
+  },
+} as const

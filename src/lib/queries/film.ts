@@ -91,7 +91,7 @@ export async function createFilmCut(
   // (a) Update remaining_length_m on the roll
   const { error: updErr } = await supabase
     .from('film_rolls')
-    .update({ remaining_length_m: String(input.remainingAfterM) })
+    .update({ remaining_length_m: input.remainingAfterM })
     .eq('id', input.filmRollId)
     .eq('shop_id', shopId)
 
@@ -105,8 +105,8 @@ export async function createFilmCut(
       film_roll_id: input.filmRollId,
       car_type: input.carType,
       positions: input.positions,
-      length_used_m: String(input.lengthUsedM),
-      remaining_after_m: String(input.remainingAfterM),
+      length_used_m: input.lengthUsedM,
+      remaining_after_m: input.remainingAfterM,
       job_id: input.jobId ?? null,
       cut_by: input.cutBy ?? null,
       notes: input.notes ?? null,
@@ -134,20 +134,16 @@ export async function createFilmRoll(
     minLengthAlertM?: number
   },
 ): Promise<{ error?: string }> {
-  const totalStr = String(input.totalLengthM)
-
   const { error } = await supabase.from('film_rolls').insert({
     shop_id: shopId,
     name: input.name,
     brand: input.brand ?? null,
     specification: input.specification ?? null,
-    width_cm: String(input.widthCm),
-    total_length_m: totalStr,
-    remaining_length_m: totalStr,
+    width_cm: input.widthCm,
+    total_length_m: input.totalLengthM,
+    remaining_length_m: input.totalLengthM,
     color_hex: input.colorHex ?? '#000000',
-    min_length_alert_m: input.minLengthAlertM != null
-      ? String(input.minLengthAlertM)
-      : '1',
+    min_length_alert_m: input.minLengthAlertM ?? 1,
   })
 
   return error ? { error: error.message } : {}

@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
-import type { Database } from '@/types/database.types'
+import type { Database, Json } from '@/types/database.types'
 import { SmsAdapter } from './sms-adapter'
 import { LineNotifyAdapter } from './line-adapter'
 import type { NotificationPayload } from './types'
@@ -50,7 +50,7 @@ export async function dispatchNotification(
     event: payload.event as Database['public']['Enums']['notification_event'],
     channel: payload.channel as Database['public']['Enums']['notification_channel'],
     recipient: payload.recipient,
-    payload: payload.metadata ?? {},
+    payload: (payload.metadata ?? {}) as Json,
     status: success ? 'sent' : notConfigured ? 'pending' : 'failed',
     error_msg: errorMsg ?? null,
     sent_at: success ? new Date().toISOString() : null,
