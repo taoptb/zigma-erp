@@ -1,5 +1,5 @@
 CREATE TABLE film_rolls (
-  id                   UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id                   UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   shop_id              UUID NOT NULL REFERENCES shops(id) ON DELETE CASCADE,
   name                 TEXT NOT NULL,
   brand                TEXT,
@@ -20,7 +20,7 @@ CREATE TRIGGER film_rolls_updated_at
   BEFORE UPDATE ON film_rolls FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
 CREATE TABLE film_templates (
-  id         UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   shop_id    UUID REFERENCES shops(id) ON DELETE CASCADE,
   car_type   TEXT NOT NULL,
   position   TEXT NOT NULL,
@@ -30,7 +30,7 @@ CREATE TABLE film_templates (
 );
 
 CREATE TABLE film_cuts (
-  id                UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   shop_id           UUID NOT NULL REFERENCES shops(id) ON DELETE CASCADE,
   film_roll_id      UUID NOT NULL REFERENCES film_rolls(id) ON DELETE CASCADE,
   job_id            UUID REFERENCES jobs(id) ON DELETE SET NULL,

@@ -1,5 +1,5 @@
 CREATE TABLE invoices (
-  id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   shop_id         UUID NOT NULL REFERENCES shops(id) ON DELETE CASCADE,
   invoice_number  TEXT NOT NULL,
   job_id          UUID REFERENCES jobs(id) ON DELETE SET NULL,
@@ -30,7 +30,7 @@ CREATE TRIGGER invoices_updated_at
   BEFORE UPDATE ON invoices FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
 CREATE TABLE invoice_items (
-  id            UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   shop_id       UUID NOT NULL REFERENCES shops(id) ON DELETE CASCADE,
   invoice_id    UUID NOT NULL REFERENCES invoices(id) ON DELETE CASCADE,
   stock_item_id UUID REFERENCES stock_items(id) ON DELETE SET NULL,

@@ -1,5 +1,5 @@
 CREATE TABLE insurance_claims (
-  id                UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   shop_id           UUID NOT NULL REFERENCES shops(id) ON DELETE CASCADE,
   job_id            UUID REFERENCES jobs(id) ON DELETE SET NULL,
   claim_number      TEXT NOT NULL,
@@ -25,7 +25,7 @@ CREATE TRIGGER claims_updated_at
   BEFORE UPDATE ON insurance_claims FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
 CREATE TABLE claim_documents (
-  id            UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   shop_id       UUID NOT NULL REFERENCES shops(id) ON DELETE CASCADE,
   claim_id      UUID NOT NULL REFERENCES insurance_claims(id) ON DELETE CASCADE,
   document_name TEXT NOT NULL,

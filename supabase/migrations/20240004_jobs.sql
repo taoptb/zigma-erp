@@ -1,5 +1,5 @@
 CREATE TABLE customers (
-  id           UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   shop_id      UUID NOT NULL REFERENCES shops(id) ON DELETE CASCADE,
   name         TEXT NOT NULL,
   phone        TEXT,
@@ -14,7 +14,7 @@ CREATE TRIGGER customers_updated_at
   BEFORE UPDATE ON customers FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
 CREATE TABLE vehicles (
-  id            UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   shop_id       UUID NOT NULL REFERENCES shops(id) ON DELETE CASCADE,
   customer_id   UUID REFERENCES customers(id) ON DELETE SET NULL,
   license_plate TEXT NOT NULL,
@@ -32,7 +32,7 @@ CREATE TRIGGER vehicles_updated_at
   BEFORE UPDATE ON vehicles FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
 CREATE TABLE jobs (
-  id                 UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id                 UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   shop_id            UUID NOT NULL REFERENCES shops(id) ON DELETE CASCADE,
   job_number         TEXT NOT NULL,
   vehicle_id         UUID REFERENCES vehicles(id) ON DELETE SET NULL,
@@ -64,7 +64,7 @@ CREATE TRIGGER jobs_updated_at
   BEFORE UPDATE ON jobs FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
 CREATE TABLE job_status_history (
-  id          UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   job_id      UUID NOT NULL REFERENCES jobs(id) ON DELETE CASCADE,
   shop_id     UUID NOT NULL REFERENCES shops(id) ON DELETE CASCADE,
   from_status job_status,
@@ -75,7 +75,7 @@ CREATE TABLE job_status_history (
 );
 
 CREATE TABLE job_damage_checklist (
-  id          UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   job_id      UUID NOT NULL REFERENCES jobs(id) ON DELETE CASCADE,
   shop_id     UUID NOT NULL REFERENCES shops(id) ON DELETE CASCADE,
   item        TEXT NOT NULL,

@@ -8,7 +8,7 @@ END;
 $$;
 
 CREATE TABLE shops (
-  id           UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name         TEXT NOT NULL,
   slug         TEXT UNIQUE NOT NULL,
   address      TEXT,
@@ -43,7 +43,7 @@ CREATE TRIGGER profiles_updated_at
   FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
 CREATE TABLE shop_invitations (
-  id           UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   shop_id      UUID NOT NULL REFERENCES shops(id) ON DELETE CASCADE,
   email        TEXT NOT NULL,
   role         user_role NOT NULL,

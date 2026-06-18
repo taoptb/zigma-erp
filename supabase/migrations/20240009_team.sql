@@ -1,5 +1,5 @@
 CREATE TABLE technician_capacity (
-  id            UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   shop_id       UUID NOT NULL REFERENCES shops(id) ON DELETE CASCADE,
   technician_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   work_date     DATE NOT NULL DEFAULT CURRENT_DATE,
@@ -9,7 +9,7 @@ CREATE TABLE technician_capacity (
 );
 
 CREATE TABLE job_assignments (
-  id            UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   shop_id       UUID NOT NULL REFERENCES shops(id) ON DELETE CASCADE,
   job_id        UUID NOT NULL REFERENCES jobs(id) ON DELETE CASCADE,
   technician_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,

@@ -1,5 +1,5 @@
 CREATE TABLE stock_items (
-  id             UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   shop_id        UUID NOT NULL REFERENCES shops(id) ON DELETE CASCADE,
   product_code   TEXT NOT NULL,
   name           TEXT NOT NULL,
@@ -33,7 +33,7 @@ CREATE TRIGGER stock_items_updated_at
   BEFORE UPDATE ON stock_items FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
 CREATE TABLE stock_movements (
-  id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   shop_id         UUID NOT NULL REFERENCES shops(id) ON DELETE CASCADE,
   stock_item_id   UUID NOT NULL REFERENCES stock_items(id) ON DELETE CASCADE,
   job_id          UUID REFERENCES jobs(id) ON DELETE SET NULL,
