@@ -1,8 +1,10 @@
 import { notFound, redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getJob } from '@/lib/queries/jobs'
+import { listJobPhotos } from '@/lib/queries/storage'
 import { StatusBadge } from '@/components/jobs/status-badge'
 import { JobStatusActions } from '@/components/jobs/job-status-actions'
+import { PhotoUpload } from '@/components/jobs/photo-upload'
 import type { JobType } from '@/types/app.types'
 
 const JOB_TYPE_LABELS: Record<JobType, string> = {
@@ -35,6 +37,8 @@ export default async function JobDetailPage({
 
   const job = await getJob(supabase, profile.shop_id, id)
   if (!job) notFound()
+
+  const photoUrls = await listJobPhotos(supabase, profile.shop_id, job.id)
 
   const { data: history } = await supabase
     .from('job_status_history')
@@ -109,6 +113,10 @@ export default async function JobDetailPage({
           </div>
         </div>
       )}
+
+      <div className="mt-6">
+        <PhotoUpload shopId={profile.shop_id} jobId={job.id} initialUrls={photoUrls} />
+      </div>
     </div>
   )
 }
