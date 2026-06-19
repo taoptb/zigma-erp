@@ -42,7 +42,11 @@ export async function proxy(request: NextRequest) {
     return redirectResponse
   }
 
-  if (user && (request.nextUrl.pathname === '/' || isAuthRoute)) {
+  // Only redirect logged-in users away from / and /login.
+  // Do NOT redirect from /register — a logged-in user with no shop still needs it.
+  const isLoginOnly = request.nextUrl.pathname === '/' ||
+    request.nextUrl.pathname.startsWith('/login')
+  if (user && isLoginOnly) {
     return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 

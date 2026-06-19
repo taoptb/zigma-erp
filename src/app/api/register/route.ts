@@ -55,11 +55,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'สร้างอู่ไม่สำเร็จ กรุณาลองใหม่' }, { status: 500 })
   }
 
-  // 3. Link profile (trigger already created it; just update)
+  // 3. Link profile (upsert handles race between trigger and API)
   const { error: profileError } = await admin
     .from('profiles')
-    .update({ shop_id: shop.id, role: 'owner', display_name: displayName })
-    .eq('id', userId)
+    .upsert({ id: userId, shop_id: shop.id, role: 'owner', display_name: displayName }, { onConflict: 'id' })
 
   if (profileError) {
     return NextResponse.json({ error: 'ตั้งค่าโปรไฟล์ไม่สำเร็จ กรุณาติดต่อผู้ดูแลระบบ' }, { status: 500 })

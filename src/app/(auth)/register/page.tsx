@@ -1,13 +1,14 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 
 export default function RegisterPage() {
   const router = useRouter()
-  const [step, setStep] = useState<'account' | 'shop'>('account')
+  // 'check' = detecting auth state, 'account' = new user, 'shop' = create shop
+  const [step, setStep] = useState<'check' | 'account' | 'shop'>('check')
   const [displayName, setDisplayName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -15,6 +16,34 @@ export default function RegisterPage() {
   const [shopPhone, setShopPhone] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [isExistingUser, setIsExistingUser] = useState(false)
+
+  // On mount: check if already logged in and if shop is missing
+  useEffect(() => {
+    async function checkAuth() {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        setStep('account')
+        return
+      }
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('shop_id')
+        .eq('id', user.id)
+        .single()
+
+      if (profile?.shop_id) {
+        // Already has a shop — go straight to dashboard
+        router.replace('/dashboard')
+      } else {
+        // Logged in but no shop yet — skip account step
+        setIsExistingUser(true)
+        setStep('shop')
+      }
+    }
+    checkAuth()
+  }, [router])
 
   function handleAccountSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -26,7 +55,25 @@ export default function RegisterPage() {
     setLoading(true)
     setError(null)
 
-    // Call server-side API — uses service role key, bypasses RLS
+    if (isExistingUser) {
+      // Already logged in — just create the shop
+      const res = await fetch('/api/setup-shop', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ shopName, shopPhone }),
+      })
+      const json = await res.json()
+      if (!res.ok) {
+        setError(json.error ?? 'สร้างอู่ไม่สำเร็จ กรุณาลองใหม่')
+        setLoading(false)
+        return
+      }
+      router.push('/dashboard')
+      router.refresh()
+      return
+    }
+
+    // New user — create account + shop via /api/register
     const res = await fetch('/api/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -54,6 +101,14 @@ export default function RegisterPage() {
 
     router.push('/dashboard')
     router.refresh()
+  }
+
+  if (step === 'check') {
+    return (
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center">
+        <p className="text-sm text-gray-400">กำลังโหลด...</p>
+      </div>
+    )
   }
 
   if (step === 'account') {
@@ -135,13 +190,15 @@ export default function RegisterPage() {
         </div>
         {error && <p className="text-sm text-red-600">{error}</p>}
         <div className="flex gap-3">
-          <button
-            type="button"
-            onClick={() => setStep('account')}
-            className="flex-1 py-2 px-4 border border-gray-300 text-gray-700 text-sm font-semibold rounded-lg hover:bg-gray-50"
-          >
-            ← ย้อนกลับ
-          </button>
+          {!isExistingUser && (
+            <button
+              type="button"
+              onClick={() => setStep('account')}
+              className="flex-1 py-2 px-4 border border-gray-300 text-gray-700 text-sm font-semibold rounded-lg hover:bg-gray-50"
+            >
+              ← ย้อนกลับ
+            </button>
+          )}
           <button
             type="submit"
             disabled={loading}
